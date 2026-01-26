@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manual de Trajetória</title>
+
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #000;
+  --text: #fff;
+  --accent: #ffcc00;
+  --card: #111;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  text-align: center;
+  padding: 20px;
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--accent);
+}
+
+.section {
+  padding: 20px;
+}
+
+.section h2 {
+  color: var(--accent);
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 15px;
+  padding: 15px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  background: #1a1a1a;
+}
+
+.card i {
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+
+.card span {
+  font-size: 12px;
+  display: block;
+}
+
+/* Dropdown */
+details {
+  background: var(--card);
+  border-radius: 15px;
+  padding: 10px;
+}
+
+details summary {
+  list-style: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+details summary i {
+  font-size: 28px;
+  color: var(--accent);
+}
+
+details summary span {
+  display: block;
+  font-size: 12px;
+}
+
+.dropdown a {
+  display: block;
+  padding: 8px;
+  color: var(--text);
+  text-decoration: none;
+  border-top: 1px solid #222;
+  font-size: 13px;
+}
+
+.dropdown a:hover {
+  color: var(--accent);
+}
+</style>
+</head>
+
+<body>
+
+<header>Manual de Trajetória</header>
+
+<!-- STREAMING -->
+<div class="section">
+  <h2>🎧 Streaming</h2>
+  <div class="grid">
+
+    <a class="card" href="https://soundon.global" target="_blank">
+      <i class="fas fa-music"></i>
+      <span>SoundOn</span>
+    </a>
+
+    <a class="card" href="https://onerpm.com" target="_blank">
+      <i class="fas fa-compact-disc"></i>
+      <span>ONErpm</span>
+    </a>
+
+    <a class="card" href="https://suamusica.com.br" target="_blank">
+      <i class="fas fa-headphones"></i>
+      <span>SuaMúsica</span>
+    </a>
+
+    <a class="card" href="https://soundiiz.com" target="_blank">
+      <i class="fas fa-random"></i>
+      <span>Soundiiz</span>
+    </a>
+
+    <!-- Spotify Dropdown -->
+    <details>
+      <summary>
+        <i class="fab fa-spotify"></i>
+        <span>Spotify</span>
+      </summary>
+      <div class="dropdown">
+        <a href="#">Playlist Gospel</a>
+        <a href="#">Playlist Piano</a>
+        <a href="#">Perfil Artista</a>
+      </div>
+    </details>
+
+    <!-- YouTube Dropdown -->
+    <details>
+      <summary>
+        <i class="fab fa-youtube"></i>
+        <span>YouTube</span>
+      </summary>
+      <div class="dropdown">
+        <a href="#">Canal Música</a>
+        <a href="#">Canal Comédia</a>
+        <a href="#">Playlist Casamentos</a>
+      </div>
+    </details>
+
+  </div>
+</div>
+
+<!-- EVENTOS -->
+<div class="section">
+  <h2>🎤 Eventos & Presença Digital</h2>
+  <div class="grid">
+
+    <a class="card" href="https://linkedin.com" target="_blank">
+      <i class="fab fa-linkedin"></i>
+      <span>LinkedIn</span>
+    </a>
+
+    <!-- Instagram Dropdown -->
+    <details>
+      <summary>
+        <i class="fab fa-instagram"></i>
+        <span>Instagram</span>
+      </summary>
+      <div class="dropdown">
+        <a href="#">Perfil Pessoal</a>
+        <a href="#">Perfil Música</a>
+        <a href="#">Perfil Casamentos</a>
+        <a href="#">+ Novo Perfil</a>
+      </div>
+    </details>
+
+    <a class="card" href="https://www.casamentos.com.br" target="_blank">
+      <i class="fas fa-ring"></i>
+      <span>Casamentos</span>
+    </a>
+
+    <a class="card" href="https://suamusica.com.br" target="_blank">
+      <i class="fas fa-microphone"></i>
+      <span>SuaMúsica</span>
+    </a>
+
+    <a class="card" href="https://econodata.com.br" target="_blank">
+      <i class="fas fa-chart-line"></i>
+      <span>Econodata</span>
+    </a>
+
+    <a class="card" href="https://github.com" target="_blank">
+      <i class="fab fa-github"></i>
+      <span>GitHub</span>
+    </a>
+
+  </div>
+</div>
+
+</body>
+</html>
