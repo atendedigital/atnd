@@ -122,30 +122,38 @@
 <button onclick="generatePhrases()">Refresh 🔄</button>
 
 <script>
-    const intro = [
-        "Às vezes, carregar tudo sozinho se torna pesado.",
-        "Nem sempre conseguimos dar conta de tudo sem apoio.",
-        "Quando o emocional pede socorro, escutar faz diferença.",
-        "Todos passamos por momentos que exigem mais cuidado.",
-        "Cuidar da mente é tão importante quanto cuidar do corpo.",
-        "A vida pode ficar mais leve quando você aprende a se ouvir."
-    ];
 
-    const meio = [
-        "A terapia oferece um espaço seguro para acolher sentimentos e reorganizar pensamentos.",
-        "A terapia é um ambiente de escuta que ajuda a compreender emoções e padrões.",
-        "A terapia te ajuda a encontrar clareza, equilíbrio e um novo olhar sobre o que sente.",
-        "A terapia abre caminho para autoconhecimento e fortalecimento emocional.",
-        "A terapia possibilita compreender suas próprias necessidades emocionais com profundidade.",
-        "A terapia auxilia na reorganização interna e traz direção em momentos de dúvida."
-    ];
-
-    const final = [
-        "Agende sua sessão online e cuide do que realmente importa.",
-        "O atendimento virtual está disponível para Feira de Santana e todo o Brasil.",
-        "Marque sua consulta e dê o primeiro passo para uma vida mais leve.",
-        "O consultório virtual te espera com acolhimento e sigilo.",
-        "Apoio psicológico disponível no conforto do seu espaço."
+    const frases = [
+        "Confie no processo. Nem tudo floresce no primeiro dia, mas tudo cresce no tempo certo.",
+        "Não desista só porque está difícil. Às vezes, o difícil é o que te fortalece.",
+        "O tempo que parece atraso pode ser preparação para algo maior.",
+        "Pare de esperar o momento perfeito. A vida acontece no agora.",
+        "Quem anda, mesmo tropeçando, chega mais perto do destino.",
+        "Nem todo progresso é visível, mas todo esforço conta.",
+        "A pressa pode roubar aprendizados que só o tempo ensina.",
+        "Grandes conquistas costumam exigir paciência silenciosa.",
+        "Não se apresse. Raízes profundas crescem devagar.",
+        "Desistir pode parecer alívio, mas continuar constrói transformação.",
+        "Confiar no processo é entender que cada fase tem sua função.",
+        "A vida não espera você se sentir pronto.",
+        "Mesmo passos pequenos te tiram do mesmo lugar.",
+        "O tempo trabalha a favor de quem persiste.",
+        "Não espere o cenário ideal. Comece com o que você tem.",
+        "Tropeços não anulam o caminho percorrido.",
+        "Tudo que amadurece leva tempo — inclusive você.",
+        "Persistência supera talento quando o talento desiste.",
+        "Não confunda demora com fracasso.",
+        "Quem continua, mesmo com medo, já está vencendo.",
+        "O processo molda você para sustentar aquilo que deseja.",
+        "A vida se move. Decida mover-se com ela.",
+        "Não se cobre velocidade, construa consistência.",
+        "A espera também é parte da jornada.",
+        "Cada tentativa é um avanço invisível.",
+        "O tempo certo raramente parece perfeito.",
+        "Continue. O futuro é construído no esforço de hoje.",
+        "Errar faz parte, parar é opcional.",
+        "A caminhada lenta ainda é caminhada.",
+        "Você não precisa correr, só não pode parar."
     ];
 
     const hashtags = [
@@ -158,12 +166,10 @@
     ];
 
     function gerarLegenda() {
-        const a = intro[Math.floor(Math.random() * intro.length)];
-        const b = meio[Math.floor(Math.random() * meio.length)];
-        const c = final[Math.floor(Math.random() * final.length)];
+        const frase = frases[Math.floor(Math.random() * frases.length)];
         const h = hashtags[Math.floor(Math.random() * hashtags.length)];
 
-        let texto = `${a} ${b} ${c}\n${h}`;
+        let texto = `${frase}\n${h}`;
         return texto.length > 840 ? texto.slice(0, 235) + "..." : texto;
     }
 
@@ -196,6 +202,7 @@
     }
 
     generatePhrases();
+
 </script>
 
 </body>
