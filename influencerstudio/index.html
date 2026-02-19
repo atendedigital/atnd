@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Prompts — IA Influencer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --card: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #ff3cac;
+    --accent2: #7b2ff7;
+    --accent3: #00d4ff;
+    --text: #f0f0f5;
+    --muted: #888899;
+    --success: #00e89b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated mesh background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(123,47,247,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(255,60,172,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 60% 10%, rgba(0,212,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,60,172,0.12);
+    border: 1px solid rgba(255,60,172,0.3);
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.05;
+    background: linear-gradient(135deg, #fff 0%, #ff3cac 50%, #7b2ff7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 300;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Category filter */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .filter-btn {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(255,60,172,0.08);
+  }
+
+  .filter-btn.active {
+    background: rgba(255,60,172,0.15);
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s;
+    group: true;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,60,172,0.05), rgba(123,47,247,0.05));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .card:hover {
+    border-color: rgba(255,60,172,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(255,60,172,0.15);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .tag.futebol  { background: rgba(0,212,255,0.12); color: var(--accent3); }
+  .tag.dancas   { background: rgba(255,60,172,0.12); color: var(--accent); }
+  .tag.fitness  { background: rgba(123,47,247,0.12); color: #b87fff; }
+  .tag.praia    { background: rgba(255,180,0,0.12);  color: #ffcc44; }
+  .tag.moto     { background: rgba(255,80,0,0.12);   color: #ff7040; }
+  .tag.animais  { background: rgba(0,232,155,0.12);  color: var(--success); }
+  .tag.lifestyle{ background: rgba(200,200,255,0.1); color: #aaaaff; }
+  .tag.aventura { background: rgba(255,140,0,0.1);   color: #ffaa44; }
+
+  .copy-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    color: var(--muted);
+  }
+
+  .card:hover .copy-icon {
+    background: rgba(255,60,172,0.15);
+    border-color: rgba(255,60,172,0.4);
+    color: var(--accent);
+  }
+
+  .card.copied .copy-icon {
+    background: rgba(0,232,155,0.15);
+    border-color: rgba(0,232,155,0.4);
+    color: var(--success);
+  }
+
+  .prompt-text {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #ccccd8;
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+  }
+
+  .prompt-text::before {
+    content: '"';
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    color: rgba(255,60,172,0.25);
+    line-height: 0;
+    vertical-align: -0.4em;
+    margin-right: 4px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface);
+    border: 1px solid var(--success);
+    color: var(--success);
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 32px rgba(0,232,155,0.2);
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .count {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+
+  .count span {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="badge">✦ IA Influencer Studio</div>
+    <h1>Gerador de<br>Prompts Visuais</h1>
+    <p class="subtitle">Clique em qualquer card para copiar o prompt e colar no seu gerador de imagens preferido.</p>
+  </header>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="dancas">🕺 Danças</button>
+    <button class="filter-btn" data-filter="futebol">⚽ Futebol</button>
+    <button class="filter-btn" data-filter="fitness">💪 Fitness</button>
+    <button class="filter-btn" data-filter="praia">🏖️ Praia & Piscina</button>
+    <button class="filter-btn" data-filter="moto">🏍️ Moto & Velocidade</button>
+    <button class="filter-btn" data-filter="animais">🐱 Animais</button>
+    <button class="filter-btn" data-filter="aventura">🐴 Aventura</button>
+    <button class="filter-btn" data-filter="lifestyle">✨ Lifestyle</button>
+  </div>
+
+  <div class="count">Mostrando <span id="visible-count">38</span> prompts</div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="toast" id="toast">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  Prompt copiado!
+</div>
+
+<script>
+const prompts = [
+  // DANÇAS
+  { tag: 'dancas', label: '🕺 Danças', text: 'faça ela sorrir, jogar o cabelo, e fazer uns passinhos de funk carioca estilo TikTok, energia alta, fundo urbano com luzes coloridas' },
+  { tag: 'dancas', label: '🕺 Danças', text: 'faça ela dançar passinhos de reggaeton, quadril marcado, expressão confiante, cenário de festa ao ar livre à noite com luz quente' },
+  { tag: 'dancas', label: '🕺 Danças', text: 'faça ela dançar estilo samba/pagodinho brasileiro, sorriso aberto, vestido colorido rodando, cenário de quintal de festa com bandeirinhas' },
+  { tag: 'dancas', label: '🕺 Danças', text: 'faça ela dançar forró, par imaginário, roupa caipira estilosa, cenário de arraial com bandeirinha e fogueira ao fundo, noite quente do nordeste' },
+  { tag: 'dancas', label: '🕺 Danças', text: 'faça ela dançar axé baiano na rua, look carnavalesco vibrante, confetes e purpurina no ar, bloco de carnaval ao fundo' },
+  { tag: 'dancas', label: '🕺 Danças', text: 'faça ela fazer trend do TikTok com mãos na câmera e cara desafiadora, iluminação de anel de luz refletida nos olhos, fundo neutro escuro' },
+  { tag: 'dancas', label: '🕺 Danças', text: 'faça ela dançar funk ostentação, movimentos exagerados, joias douradas, cenário de mansão com piscina iluminada ao fundo à noite' },
+  { tag: 'dancas', label: '🕺 Danças', text: 'faça ela dançar estilo pisadinha nordestina, chapéu de palha estiloso, sorriso rasgado, praça de cidade pequena do interior nordestino' },
+
+  // FUTEBOL
+  { tag: 'futebol', label: '⚽ Futebol', text: 'faça ela comemorando gol usando camisa do Flamengo, braços abertos, estádio lotado ao fundo com fogos e bandeiras vermelhas e pretas' },
+  { tag: 'futebol', label: '⚽ Futebol', text: 'faça ela usando camisa do Corinthians, fazendo selfie no estádio, arquibancada cheia ao fundo, expressão animada e apaixonada pelo time' },
+  { tag: 'futebol', label: '⚽ Futebol', text: 'faça ela chutando bola em campo de futebol, camisa do Brasil, relva verde perfeita, cena cinematográfica com luz dourada de fim de tarde' },
+  { tag: 'futebol', label: '⚽ Futebol', text: 'faça ela com camisa do Grêmio ou Internacional, cachecol no pescoço, cenário de Porto Alegre com frio, respiração visível no ar frio' },
+  { tag: 'futebol', label: '⚽ Futebol', text: 'faça ela assistindo jogo numa boteco, camisa do time, cerveja na mão, amigos desfocados ao fundo, expressão tensa de torcedora raiz' },
+
+  // FITNESS
+  { tag: 'fitness', label: '💪 Fitness', text: 'mude o cenário para academia, look fitness completo (top e legging), segurando halteres, espelho ao fundo, iluminação de academia moderna' },
+  { tag: 'fitness', label: '💪 Fitness', text: 'faça ela em postura de agachamento na academia, look fitness estiloso, glúteos em destaque, expressão focada e determinada' },
+  { tag: 'fitness', label: '💪 Fitness', text: 'faça ela correndo na esteira, fone de ouvido, look esportivo, gotas de suor no rosto, expressão de superação, academia com espelhos ao fundo' },
+  { tag: 'fitness', label: '💪 Fitness', text: 'faça ela fazendo pose de flexão de bíceps para a câmera, top fitness, músculos definidos, academia ao fundo desfocada com luz dramática' },
+  { tag: 'fitness', label: '💪 Fitness', text: 'faça ela numa aula de dança fit, zumba ou jump, roupa colorida fitness, grupo desfocado ao fundo, amplo sorriso e energia contagiante' },
+
+  // PRAIA & PISCINA
+  { tag: 'praia', label: '🏖️ Praia & Piscina', text: 'mude o cenário para piscina, biquíni estiloso destacando corpo bem trabalhado, água azul cristalina, luz de verão, pose relaxada e confiante' },
+  { tag: 'praia', label: '🏖️ Praia & Piscina', text: 'faça ela na praia do nordeste, biquíni colorido, água verde-esmeralda ao fundo, areia branca, cabelo molhado jogado, sorriso radiante' },
+  { tag: 'praia', label: '🏖️ Praia & Piscina', text: 'faça ela saindo do mar em câmera lenta estilo cena de filme, biquíni pequeno, água escorrendo pelo corpo, pôr do sol dramático ao fundo' },
+  { tag: 'praia', label: '🏖️ Praia & Piscina', text: 'faça ela em cima de stand-up paddle no mar, biquíni fitness, corpo em equilíbrio, mar azul calmo, céu limpo, foto aérea estilo drone' },
+  { tag: 'praia', label: '🏖️ Praia & Piscina', text: 'faça ela em pool party com amigos desfocados ao fundo, biquíni estiloso, bebida na mão, piscina com iluminação colorida noturna' },
+  { tag: 'praia', label: '🏖️ Praia & Piscina', text: 'faça ela jogando vôlei de praia, short e top esportivo, areia voando, salto para defender bola, energia esportiva, praia cheia ao fundo' },
+
+  // MOTO & VELOCIDADE
+  { tag: 'moto', label: '🏍️ Moto & Velocidade', text: 'faça ela pilotando uma moto esportiva, couro preto estiloso, capacete na mão, expressão confiante e dominante, estrada aberta ao fundo' },
+  { tag: 'moto', label: '🏍️ Moto & Velocidade', text: 'faça ela sentada em cima de uma moto custom/chopper, botas de cano longo, jaqueta jeans rasgada, pôr do sol no deserto ou estrada vazia' },
+  { tag: 'moto', label: '🏍️ Moto & Velocidade', text: 'faça ela pilotando lancha sozinha no mar aberto, óculos de sol, cabelo ao vento, spray de água ao redor, expressão de liberdade total' },
+  { tag: 'moto', label: '🏍️ Moto & Velocidade', text: 'faça ela ao volante de um carro esportivo descapotável, cabelo ao vento, óculos de sol grandes, cidade ao fundo com velocidade, luz dourada' },
+
+  // ANIMAIS
+  { tag: 'animais', label: '🐱 Animais', text: 'faça ela dançando segurando o gato de estimação nos braços, gato com expressão entediada, ela sorrindo e se movendo, fundo de apartamento moderno' },
+  { tag: 'animais', label: '🐱 Animais', text: 'faça ela deitada no sofá com dois gatos em cima dela, look confortável (moletom), expressão de felicidade, apartamento aconchegante ao fundo' },
+  { tag: 'animais', label: '🐱 Animais', text: 'faça ela fazendo selfie com o gato no rosto cobrindo metade da câmera, expressão divertida, close-up, foco no olho do gato e no sorriso dela' },
+
+  // AVENTURA
+  { tag: 'aventura', label: '🐴 Aventura', text: 'faça ela andando a cavalo, roupa de amazona estilosa ou estilo country moderno, campo aberto ou fazenda ao fundo, luz dourada de fim de tarde' },
+  { tag: 'aventura', label: '🐴 Aventura', text: 'faça ela em quadriciclo na lama ou dunas, look de aventura, óculos de proteção, sorriso rasgado, paisagem de dunas do nordeste ao fundo' },
+  { tag: 'aventura', label: '🐴 Aventura', text: 'faça ela em tirolesa sobre mata verde, look aventureiro, cabelo ao vento, expressão entre medo e euforia, vista aérea de floresta densa abaixo' },
+  { tag: 'aventura', label: '🐴 Aventura', text: 'faça ela praticando rapel em cachoeira, roupa de aventura, água caindo ao redor, expressão de superação, verde exuberante da mata atlântica' },
+
+  // LIFESTYLE
+  { tag: 'lifestyle', label: '✨ Lifestyle', text: 'faça ela em mesa de boteco com petiscos, cerveja gelada, roupa casual estilosa, mesa com amigos desfocados, atmosfera animada de boteco brasileiro' },
+  { tag: 'lifestyle', label: '✨ Lifestyle', text: 'faça ela fazendo live no celular, anel de luz refletido nos olhos, expressão animada e interagindo com câmera, quarto bem decorado ao fundo' },
+  { tag: 'lifestyle', label: '✨ Lifestyle', text: 'faça ela num café instagramável de SP ou RJ, bebida estilosa na mão, look casual chique, janela com luz natural, expressão descontraída' },
+  { tag: 'lifestyle', label: '✨ Lifestyle', text: 'faça ela numa festa junina estilizada, vestido xadrez moderninho, tranças, bandeirinhas ao fundo, confetes coloridos, expressão radiante e festiva' },
+];
+
+const grid = document.getElementById('grid');
+const toast = document.getElementById('toast');
+const visibleCount = document.getElementById('visible-count');
+let toastTimer;
+
+function copyIcon(copied = false) {
+  if (copied) {
+    return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+  }
+  return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+}
+
+function createCard(prompt) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.tag = prompt.tag;
+  card.innerHTML = `
+    <div class="card-top">
+      <span class="tag ${prompt.tag}">${prompt.label}</span>
+      <div class="copy-icon">${copyIcon()}</div>
+    </div>
+    <p class="prompt-text">${prompt.text}</p>
+  `;
+
+  card.addEventListener('click', () => {
+    navigator.clipboard.writeText(prompt.text).then(() => {
+      card.classList.add('copied');
+      card.querySelector('.copy-icon').innerHTML = copyIcon(true);
+
+      clearTimeout(toastTimer);
+      toast.classList.add('show');
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          card.classList.remove('copied');
+          card.querySelector('.copy-icon').innerHTML = copyIcon();
+        }, 300);
+      }, 2000);
+    });
+  });
+
+  return card;
+}
+
+// Render all
+prompts.forEach(p => grid.appendChild(createCard(p)));
+
+// Filter
+document.getElementById('filters').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+
+  const filter = e.target.dataset.filter;
+  let count = 0;
+  document.querySelectorAll('.card').forEach(card => {
+    const show = filter === 'all' || card.dataset.tag === filter;
+    card.style.display = show ? '' : 'none';
+    if (show) count++;
+  });
+  visibleCount.textContent = count;
+});
+</script>
+</body>
+</html>
