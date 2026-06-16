@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta name="robots" content="noindex" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlists Mais Visualizadas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 6s ease infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            color: #a0a0b0;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #feca57;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #8888a0;
+            margin-top: 4px;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: #feca57;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .search-box input::placeholder {
+            color: #666;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .playlist-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playlist-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #ff6b6b, #feca57);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 16px 0 0 16px;
+        }
+
+        .playlist-item:hover {
+            background: rgba(255,255,255,0.07);
+            transform: translateX(5px);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .playlist-item:hover::before {
+            opacity: 1;
+        }
+
+        .playlist-item.top-1 {
+            background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,215,0,0.03));
+            border-color: rgba(255,215,0,0.35);
+            box-shadow: 0 8px 32px rgba(255,215,0,0.15);
+        }
+
+        .playlist-item.top-1 .rank {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            box-shadow: 0 4px 20px rgba(255,215,0,0.4);
+            font-size: 1.2rem;
+            width: 48px;
+            height: 48px;
+        }
+
+        .playlist-item.top-2 {
+            background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(192,192,192,0.03));
+            border-color: rgba(192,192,192,0.3);
+            box-shadow: 0 6px 24px rgba(192,192,192,0.1);
+        }
+
+        .playlist-item.top-2 .rank {
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            color: #1a1a2e;
+            box-shadow: 0 4px 15px rgba(192,192,192,0.3);
+        }
+
+        .playlist-item.top-3 {
+            background: linear-gradient(135deg, rgba(205,127,50,0.1), rgba(205,127,50,0.03));
+            border-color: rgba(205,127,50,0.3);
+            box-shadow: 0 6px 24px rgba(205,127,50,0.1);
+        }
+
+        .playlist-item.top-3 .rank {
+            background: linear-gradient(135deg, #cd7f32, #b87333);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(205,127,50,0.3);
+        }
+
+        .playlist-item.top-10 {
+            background: linear-gradient(135deg, rgba(100,200,255,0.05), rgba(100,200,255,0.01));
+            border-color: rgba(100,200,255,0.12);
+        }
+
+        .playlist-item.top-10 .rank {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            color: #1a1a2e;
+        }
+
+        .rank {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.08);
+            color: #8888a0;
+            transition: all 0.3s ease;
+        }
+
+        .playlist-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .playlist-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f0f0f0;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playlist-item:hover .playlist-title {
+            color: #fff;
+        }
+
+        .playlist-views {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #feca57;
+            white-space: nowrap;
+        }
+
+        .playlist-views .eye-icon {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb);
+            border-radius: 0 0 0 16px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .playlist-item:hover .progress-bar {
+            opacity: 1;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+        }
+
+        .badge-silver {
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            color: #1a1a2e;
+        }
+
+        .badge-bronze {
+            background: linear-gradient(135deg, #cd7f32, #b87333);
+            color: #fff;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #555;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .playlist-title {
+                font-size: 0.9rem;
+            }
+            .playlist-views {
+                font-size: 0.8rem;
+            }
+            .stats-bar {
+                gap: 15px;
+            }
+            .stat-item {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Playlists Mais Visualizadas</h1>
+            <p>Ranking das playlists por número de visualizações</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">78</div>
+                <div class="stat-label">Playlists</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">79,224</div>
+                <div class="stat-label">Visualizações Totais</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">34 mil</div>
+                <div class="stat-label">Maior Playlist</div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Buscar playlist..." onkeyup="filterPlaylists()">
+        </div>
+
+        <div class="playlist-list" id="playlistList">
+            <div class="playlist-item top-1" data-title="melhores músicas para cantar no karaokê">
+                <div class="rank">1</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas para Cantar no Karaokê</div>
+                </div>
+                <span class="badge badge-gold">🏆 TOP 1</span>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    34 mil
+                </div>
+                <div class="progress-bar" style="width: 100.0%;"></div>
+            </div>
+            <div class="playlist-item top-2" data-title="aí que saudade d'ocê, mpb original - seleção brasileira">
+                <div class="rank">2</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Aí que saudade d'ocê, MPB Original - Seleção Brasileira</div>
+                </div>
+                <span class="badge badge-silver">🥈 TOP 2</span>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    14 mil
+                </div>
+                <div class="progress-bar" style="width: 41.2%;"></div>
+            </div>
+            <div class="playlist-item top-3" data-title="músicas para home office - música para trabalhar">
+                <div class="rank">3</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Home Office - Música Para Trabalhar</div>
+                </div>
+                <span class="badge badge-bronze">🥉 TOP 3</span>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    11 mil
+                </div>
+                <div class="progress-bar" style="width: 32.4%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="músicas para festas e confraternizações - as mais ouvidas">
+                <div class="rank">4</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Festas e Confraternizações - As Mais Ouvidas</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    3,2 mil
+                </div>
+                <div class="progress-bar" style="width: 9.4%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="pra melhorar - marisa monte, seu jorge, flor - hits do momento">
+                <div class="rank">5</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Pra Melhorar - Marisa Monte, Seu Jorge, Flor - Hits do Momento</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,9 mil
+                </div>
+                <div class="progress-bar" style="width: 8.5%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="melhores músicas para restaurante | barzinho | café music 2023">
+                <div class="rank">6</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas Para Restaurante | Barzinho | Café Music 2023</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,6 mil
+                </div>
+                <div class="progress-bar" style="width: 7.6%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="músicas para confraternização as melhores 2023">
+                <div class="rank">7</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Confraternização As Melhores 2023</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,4 mil
+                </div>
+                <div class="progress-bar" style="width: 7.1%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="na estrada - péricles, nando reis - hits do momento">
+                <div class="rank">8</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Na Estrada - Péricles, Nando Reis - Hits do Momento</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2 mil
+                </div>
+                <div class="progress-bar" style="width: 5.9%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="tangerina - tiago iorc, duda beat - atualizada">
+                <div class="rank">9</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Tangerina - TIAGO IORC, DUDA BEAT - Atualizada</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1 mil
+                </div>
+                <div class="progress-bar" style="width: 2.9%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="wow wow (feat. becky g) - maria becerra - ryan castro - arcangel - estr...">
+                <div class="rank">10</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Wow Wow (feat. Becky G) - Maria Becerra - Ryan Castro - Arcangel - Estr...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1 mil
+                </div>
+                <div class="progress-bar" style="width: 2.9%;"></div>
+            </div>
+            <div class="playlist-item " data-title="músicas para salão de beleza 2023 - mais tocadas">
+                <div class="rank">11</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Salão de Beleza 2023 - Mais Tocadas</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    767
+                </div>
+                <div class="progress-bar" style="width: 2.3%;"></div>
+            </div>
+            <div class="playlist-item " data-title="músicas para barbearia 2023">
+                <div class="rank">12</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Barbearia 2023</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    661
+                </div>
+                <div class="progress-bar" style="width: 1.9%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores músicas para festa de casamento 2023">
+                <div class="rank">13</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas Para Festa De Casamento 2023</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    380
+                </div>
+                <div class="progress-bar" style="width: 1.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="pra gente acordar - gilsons - hits do momento">
+                <div class="rank">14</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Pra Gente Acordar - Gilsons - Hits do Momento</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    256
+                </div>
+                <div class="progress-bar" style="width: 0.8%;"></div>
+            </div>
+            <div class="playlist-item " data-title="top mix hip hop - trap br - matuê, teto, orochi">
+                <div class="rank">15</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Top Mix Hip Hop - Trap BR - Matuê, Teto, Orochi</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    243
+                </div>
+                <div class="progress-bar" style="width: 0.7%;"></div>
+            </div>
+            <div class="playlist-item " data-title="wasa wasa - ryan castro - arcangel - lunay - lo mas nuevo de todo 2021">
+                <div class="rank">16</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Wasa Wasa - Ryan Castro - Arcangel - Lunay - Lo Mas Nuevo De Todo 2021</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    213
+                </div>
+                <div class="progress-bar" style="width: 0.6%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores trap rap 2021 hip hop - matuê, kawe, teto">
+                <div class="rank">17</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Trap Rap 2021 Hip Hop - Matuê, Kawe, Teto</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    213
+                </div>
+                <div class="progress-bar" style="width: 0.6%;"></div>
+            </div>
+            <div class="playlist-item " data-title="paula e bebeto - gal costa, criolo - atualizadas">
+                <div class="rank">18</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Paula e Bebeto - Gal Costa, Criolo - Atualizadas</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    212
+                </div>
+                <div class="progress-bar" style="width: 0.6%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores músicas para sorveteria - pop mpb">
+                <div class="rank">19</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas Para Sorveteria - POP MPB</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    171
+                </div>
+                <div class="progress-bar" style="width: 0.5%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - buenos aires - mc igu">
+                <div class="rank">20</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - Buenos Aires - MC Igu</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    152
+                </div>
+                <div class="progress-bar" style="width: 0.4%;"></div>
+            </div>
+            <div class="playlist-item " data-title="música para dormir rápido e relaxar profundamente, musica...">
+                <div class="rank">21</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Música para Dormir rápido e relaxar profundamente, musica...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    148
+                </div>
+                <div class="progress-bar" style="width: 0.4%;"></div>
+            </div>
+            <div class="playlist-item " data-title="instrumental music for relaxing - acoustic / bossa nova / música ins...">
+                <div class="rank">22</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Instrumental Music for Relaxing - Acoustic / Bossa Nova / Música Ins...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    103
+                </div>
+                <div class="progress-bar" style="width: 0.3%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - olho por olho - raffa moreira">
+                <div class="rank">23</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Olho por Olho - Raffa Moreira</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    94
+                </div>
+                <div class="progress-bar" style="width: 0.3%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores músicas para recepção de loja - pop mpb">
+                <div class="rank">24</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas Para Recepção de Loja - Pop MPB</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    90
+                </div>
+                <div class="progress-bar" style="width: 0.3%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - ok baby - japa">
+                <div class="rank">25</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Ok Baby - Japa</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    89
+                </div>
+                <div class="progress-bar" style="width: 0.3%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - japão - mc igu">
+                <div class="rank">26</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - Japão - MC Igu</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    87
+                </div>
+                <div class="progress-bar" style="width: 0.3%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores trap br - hip hop - matuê, md chefe, orochi">
+                <div class="rank">27</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Trap BR - Hip Hop - Matuê, MD Chefe, Orochi</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    87
+                </div>
+                <div class="progress-bar" style="width: 0.3%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2021 hip hop - matuê, orochi, l7nnon">
+                <div class="rank">28</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2021 Hip Hop - Matuê, Orochi, L7NNON</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    81
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - uma dose 2 - class a">
+                <div class="rank">29</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Uma dose 2 - Class A</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    79
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item " data-title="musica trap nacional 2021 hip hop r&b - teto, matuê, sidoka">
+                <div class="rank">30</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Musica Trap Nacional 2021 Hip Hop R&B - Teto, Matuê, Sidoka</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    75
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item " data-title="vem doce - hits - seleção">
+                <div class="rank">31</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Vem Doce - Hits - Seleção</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    67
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores músicas de novelas, tv e clássicas nacionais">
+                <div class="rank">32</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas de Novelas, TV e Clássicas Nacionais</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    66
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item " data-title="beautiful relaxing music - peaceful piano, cello & guitar music by soothin...">
+                <div class="rank">33</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Beautiful Relaxing Music - Peaceful Piano, Cello & Guitar Music by Soothin...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    64
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - favorita - volp">
+                <div class="rank">34</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - Favorita - Volp</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    63
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item " data-title="top traps do ano - matuê, teto, cabelinho - essência de cria">
+                <div class="rank">35</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Top Traps do Ano - Matuê, Teto, Cabelinho - Essência de Cria</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    62
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - dejavu - japa">
+                <div class="rank">36</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Dejavu - Japa</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    46
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap brasileiro - l7nnon, orochi, matuê">
+                <div class="rank">37</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Brasileiro - L7NNON, Orochi, Matuê</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    45
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - ak do japão - mc igu">
+                <div class="rank">38</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - Ak do Japão - MC Igu</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    43
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="3 hours relaxing music "evening meditation" background for yoga, m...">
+                <div class="rank">39</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">3 HOURS Relaxing Music "Evening Meditation" Background for Yoga, M...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    43
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap br - hip hop atualizado - matuê, orochi, l7nnon">
+                <div class="rank">40</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap BR - Hip Hop Atualizado - Matuê, Orochi, L7NNON</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    40
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="relaxing jazz music - background chill out music - music for relax...">
+                <div class="rank">41</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Relaxing Jazz Music - Background Chill Out Music - Music For Relax...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    39
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores músicas de mpb caetano veloso, djavan">
+                <div class="rank">42</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas De MPB Caetano Veloso, Djavan</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    29
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="romantic relaxing acoustic, bossa nova, saxophone music. musi...">
+                <div class="rank">43</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Romantic Relaxing Acoustic, Bossa Nova, Saxophone Music. Musi...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    26
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - flack jack - recayd mob">
+                <div class="rank">44</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - Flack Jack - Recayd Mob</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    24
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="seleção trap 2021 hip hop - matuê, l7nnon, teto">
+                <div class="rank">45</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Seleção Trap 2021 Hip Hop - Matuê, L7NNON, Teto</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    23
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="[ peaceful relaxing soothing ] meditation - instrumental music">
+                <div class="rank">46</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">[ Peaceful Relaxing Soothing ] Meditation - Instrumental Music</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    23
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - praga da vez - vk mac">
+                <div class="rank">47</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - Praga da Vez - Vk Mac</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    20
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="3 hours of deep relaxing instrumental music for sleep, meditation, yoga...">
+                <div class="rank">48</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">3 Hours of Deep Relaxing Instrumental Music for Sleep, Meditation, Yoga...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    20
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="repertório de músicas ambiente 2023 - as mais tocadas">
+                <div class="rank">49</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Repertório de Músicas Ambiente 2023 - As Mais Tocadas</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    19
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - foto - raffa moreira">
+                <div class="rank">50</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Foto - Raffa Moreira</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    19
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - camisa dez - class a">
+                <div class="rank">51</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Camisa dez - Class A</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    16
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="músicas para recepção de lojas mpb 2023">
+                <div class="rank">52</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Recepção de Lojas MPB 2023</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    15
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 lançamentos - orochi, l7nnon, matuê">
+                <div class="rank">53</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 Lançamentos - Orochi, L7NNON, Matuê</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    14
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="3 hours peaceful & relaxing instrumental music-long playlist">
+                <div class="rank">54</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">3 hours Peaceful & Relaxing Instrumental Music-Long Playlist</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    14
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="set trap nacional - hip hop br - matuê, orochi, l7nnon">
+                <div class="rank">55</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Set Trap Nacional - Hip Hop BR - Matuê, Orochi, L7NNON</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    12
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - uma dose - class a">
+                <div class="rank">56</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Uma dose - Class A</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    12
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="barzinho voz e violão melhores músicas 2023">
+                <div class="rank">57</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Barzinho Voz e Violão Melhores Músicas 2023</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    10
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores músicas ambiente para supermercado 2023">
+                <div class="rank">58</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas Ambiente Para Supermercado 2023</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    9
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - flow corey taylor - mc igu">
+                <div class="rank">59</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - Flow Corey Taylor - MC Igu</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    9
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="músicas para restaurante mpb">
+                <div class="rank">60</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Restaurante MPB</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    8
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - por nós - class a">
+                <div class="rank">61</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Por nós - Class A</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    7
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - nicole bahls - mc igu">
+                <div class="rank">62</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - Nicole Bahls - MC Igu</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    6
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - la - mc igu">
+                <div class="rank">63</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - La - MC Igu</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    5
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="calm instrumental music - piano - 24/7: study music, focus, think, me...">
+                <div class="rank">64</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Calm Instrumental Music - Piano - 24/7: study music, focus, think, me...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    4
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - hoje tu pode - class a">
+                <div class="rank">65</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Hoje tu pode - Class A</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="reggaeton mix - flow hp - don omar - mora - karol g">
+                <div class="rank">66</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Reggaeton Mix - Flow HP - Don Omar - Mora - KAROL G</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores músicas para cafeterias 2023 - barzinho">
+                <div class="rank">67</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas Para Cafeterias 2023 - Barzinho</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="melhores músicas para festa de noivado 2023">
+                <div class="rank">68</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas Para Festa de Noivado 2023</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="cd clássicas da mpb caetano djavan e mais">
+                <div class="rank">69</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">CD Clássicas da MPB Caetano Djavan e mais</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="músicas ambiente restaurante - variadas - mpb - pop">
+                <div class="rank">70</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Ambiente Restaurante - Variadas - MPB - POP</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap nacional 2020 - saturno - burn-o">
+                <div class="rank">71</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap Nacional 2020 - Saturno - Burn-O</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trap 2021 - nós dois - class a">
+                <div class="rank">72</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trap 2021 - Nós dois - Class A</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="new age music: relaxing music; reiki music; yoga music; relaxation music...">
+                <div class="rank">73</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">New Age Music: Relaxing Music; Reiki Music; Yoga Music; Relaxation Music...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="relaxing music for stress relief. calm music for meditation, sleep, heali...">
+                <div class="rank">74</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Relaxing Music for Stress Relief. Calm Music for Meditation, Sleep, Heali...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="beautiful guitar & piano music, vol. 3 ~ relaxing music 020">
+                <div class="rank">75</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Beautiful Guitar & Piano Music, Vol. 3 ~ Relaxing Music 020</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="relaxing music for stress relief. soothing sleep music. relaxation">
+                <div class="rank">76</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Relaxing Music for Stress Relief. Soothing Sleep Music. Relaxation</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="3 hours relaxing music for stress relief {completely beat insom...">
+                <div class="rank">77</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">3 HOURS Relaxing Music for Stress Relief {Completely Beat Insom...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item " data-title="deep relaxing music, vol. 1 - ambient music for sleep, meditation, focu...">
+                <div class="rank">78</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Deep Relaxing Music, Vol. 1 - Ambient Music for Sleep, Meditation, Focu...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    0
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            Nenhuma playlist encontrada 😕
+        </div>
+
+        <div class="footer">
+            Dados compilados de visualizações do YouTube
+        </div>
+    </div>
+
+    <script>
+        function filterPlaylists() {{
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const list = document.getElementById('playlistList');
+            const items = list.getElementsByClassName('playlist-item');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            for (let i = 0; i < items.length; i++) {{
+                const title = items[i].getAttribute('data-title');
+                if (title.includes(filter)) {{
+                    items[i].style.display = '';
+                    visibleCount++;
+                }} else {{
+                    items[i].style.display = 'none';
+                }}
+            }}
+
+            if (visibleCount === 0) {{
+                list.style.display = 'none';
+                noResults.style.display = '';
+            }} else {{
+                list.style.display = '';
+                noResults.style.display = 'none';
+            }}
+        }}
+    </script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta name="robots" content="noindex" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu de Playlists</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 6s ease infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            color: #a0a0b0;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #feca57;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #8888a0;
+            margin-top: 4px;
+        }
+
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #ff6b6b, #feca57);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 16px 0 0 16px;
+        }
+
+        .menu-item:hover {
+            background: rgba(255,255,255,0.07);
+            transform: translateX(5px);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .menu-item:hover::before {
+            opacity: 1;
+        }
+
+        .menu-item.top-1 {
+            background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,215,0,0.03));
+            border-color: rgba(255,215,0,0.35);
+            box-shadow: 0 8px 32px rgba(255,215,0,0.15);
+        }
+
+        .menu-item.top-1 .rank {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            box-shadow: 0 4px 20px rgba(255,215,0,0.4);
+            font-size: 1.2rem;
+            width: 48px;
+            height: 48px;
+        }
+
+        .menu-item.top-2 {
+            background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(192,192,192,0.03));
+            border-color: rgba(192,192,192,0.3);
+            box-shadow: 0 6px 24px rgba(192,192,192,0.1);
+        }
+
+        .menu-item.top-2 .rank {
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            color: #1a1a2e;
+            box-shadow: 0 4px 15px rgba(192,192,192,0.3);
+        }
+
+        .menu-item.top-3 {
+            background: linear-gradient(135deg, rgba(205,127,50,0.1), rgba(205,127,50,0.03));
+            border-color: rgba(205,127,50,0.3);
+            box-shadow: 0 6px 24px rgba(205,127,50,0.1);
+        }
+
+        .menu-item.top-3 .rank {
+            background: linear-gradient(135deg, #cd7f32, #b87333);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(205,127,50,0.3);
+        }
+
+        .menu-item.top-10 {
+            background: linear-gradient(135deg, rgba(100,200,255,0.05), rgba(100,200,255,0.01));
+            border-color: rgba(100,200,255,0.12);
+        }
+
+        .menu-item.top-10 .rank {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            color: #1a1a2e;
+        }
+
+        .rank {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.08);
+            color: #8888a0;
+            transition: all 0.3s ease;
+        }
+
+        .menu-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .menu-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f0f0f0;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .menu-item:hover .menu-title {
+            color: #fff;
+        }
+
+        .menu-arrow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #feca57;
+            white-space: nowrap;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+        }
+
+        .badge-silver {
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            color: #1a1a2e;
+        }
+
+        .badge-bronze {
+            background: linear-gradient(135deg, #cd7f32, #b87333);
+            color: #fff;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb);
+            border-radius: 0 0 0 16px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-item:hover .progress-bar {
+            opacity: 1;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #555;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .menu-title {
+                font-size: 0.9rem;
+            }
+            .stats-bar {
+                gap: 15px;
+            }
+            .stat-item {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Menu de Playlists</h1>
+            <p>Selecione uma playlist para visualizar o ranking</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Playlists</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">Menu</div>
+                <div class="stat-label">Navegação</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">2026</div>
+                <div class="stat-label">Atualizado</div>
+            </div>
+        </div>
+
+        <div class="menu-list">
+            <a href="1.html" class="menu-item top-1">
+                <div class="rank">1</div>
+                <div class="menu-info">
+                    <div class="menu-title">Playlist 1 — Ranking de Visualizações</div>
+                </div>
+                <span class="badge badge-gold">🏆 TOP 1</span>
+                <div class="menu-arrow">→</div>
+                <div class="progress-bar" style="width: 100%;"></div>
+            </a>
+            <a href="2.html" class="menu-item top-2">
+                <div class="rank">2</div>
+                <div class="menu-info">
+                    <div class="menu-title">Playlist 2 — Ranking de Visualizações</div>
+                </div>
+                <span class="badge badge-silver">🥈 TOP 2</span>
+                <div class="menu-arrow">→</div>
+                <div class="progress-bar" style="width: 80%;"></div>
+            </a>
+            <a href="3.html" class="menu-item top-3">
+                <div class="rank">3</div>
+                <div class="menu-info">
+                    <div class="menu-title">Playlist 3 — Ranking de Visualizações</div>
+                </div>
+                <span class="badge badge-bronze">🥉 TOP 3</span>
+                <div class="menu-arrow">→</div>
+                <div class="progress-bar" style="width: 60%;"></div>
+            </a>
+            <a href="4.html" class="menu-item top-10">
+                <div class="rank">4</div>
+                <div class="menu-info">
+                    <div class="menu-title">Playlist 4 — Ranking de Visualizações</div>
+                </div>
+                <div class="menu-arrow">→</div>
+                <div class="progress-bar" style="width: 40%;"></div>
+            </a>
+            <a href="5.html" class="menu-item">
+                <div class="rank">5</div>
+                <div class="menu-info">
+                    <div class="menu-title">Playlist 5 — Ranking de Visualizações</div>
+                </div>
+                <div class="menu-arrow">→</div>
+                <div class="progress-bar" style="width: 20%;"></div>
+            </a>
+        </div>
+
+        <div class="footer">
+            Dados compilados de visualizações do YouTube
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta name="robots" content="noindex" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlists Mais Visualizadas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 6s ease infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            color: #a0a0b0;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #feca57;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #8888a0;
+            margin-top: 4px;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: #feca57;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .search-box input::placeholder {
+            color: #666;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .playlist-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playlist-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #ff6b6b, #feca57);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 16px 0 0 16px;
+        }
+
+        .playlist-item:hover {
+            background: rgba(255,255,255,0.07);
+            transform: translateX(5px);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .playlist-item:hover::before {
+            opacity: 1;
+        }
+
+        .playlist-item.top-1 {
+            background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,215,0,0.03));
+            border-color: rgba(255,215,0,0.35);
+            box-shadow: 0 8px 32px rgba(255,215,0,0.15);
+        }
+
+        .playlist-item.top-1 .rank {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            box-shadow: 0 4px 20px rgba(255,215,0,0.4);
+            font-size: 1.2rem;
+            width: 48px;
+            height: 48px;
+        }
+
+        .playlist-item.top-2 {
+            background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(192,192,192,0.03));
+            border-color: rgba(192,192,192,0.3);
+            box-shadow: 0 6px 24px rgba(192,192,192,0.1);
+        }
+
+        .playlist-item.top-2 .rank {
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            color: #1a1a2e;
+            box-shadow: 0 4px 15px rgba(192,192,192,0.3);
+        }
+
+        .playlist-item.top-3 {
+            background: linear-gradient(135deg, rgba(205,127,50,0.1), rgba(205,127,50,0.03));
+            border-color: rgba(205,127,50,0.3);
+            box-shadow: 0 6px 24px rgba(205,127,50,0.1);
+        }
+
+        .playlist-item.top-3 .rank {
+            background: linear-gradient(135deg, #cd7f32, #b87333);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(205,127,50,0.3);
+        }
+
+        .playlist-item.top-10 {
+            background: linear-gradient(135deg, rgba(100,200,255,0.05), rgba(100,200,255,0.01));
+            border-color: rgba(100,200,255,0.12);
+        }
+
+        .playlist-item.top-10 .rank {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            color: #1a1a2e;
+        }
+
+        .rank {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.08);
+            color: #8888a0;
+            transition: all 0.3s ease;
+        }
+
+        .playlist-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .playlist-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f0f0f0;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playlist-item:hover .playlist-title {
+            color: #fff;
+        }
+
+        .playlist-views {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #feca57;
+            white-space: nowrap;
+        }
+
+        .playlist-views .eye-icon {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb);
+            border-radius: 0 0 0 16px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .playlist-item:hover .progress-bar {
+            opacity: 1;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+        }
+
+        .badge-silver {
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            color: #1a1a2e;
+        }
+
+        .badge-bronze {
+            background: linear-gradient(135deg, #cd7f32, #b87333);
+            color: #fff;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #555;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .playlist-title {
+                font-size: 0.9rem;
+            }
+            .playlist-views {
+                font-size: 0.8rem;
+            }
+            .stats-bar {
+                gap: 15px;
+            }
+            .stat-item {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Playlists Mais Visualizadas</h1>
+            <p>Ranking das playlists por número de visualizações</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">136</div>
+                <div class="stat-label">Playlists</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">7,3 milhões</div>
+                <div class="stat-label">Visualizações Totais</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">2,9 milhões</div>
+                <div class="stat-label">Maior Playlist</div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Buscar playlist..." onkeyup="filterPlaylists()">
+        </div>
+
+        <div class="playlist-list" id="playlistList">
+            <div class="playlist-item top-1" data-title="arlindo cruz - as melhores músicas">
+                <div class="rank">1</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Arlindo Cruz - As Melhores Músicas</div>
+                </div>
+                <span class="badge badge-gold">🏆 TOP 1</span>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,9 milhões
+                </div>
+                <div class="progress-bar" style="width: 100%;"></div>
+            </div>
+            <div class="playlist-item top-2" data-title="altemar dutra - as melhores músicas">
+                <div class="rank">2</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Altemar Dutra - As Melhores Músicas</div>
+                </div>
+                <span class="badge badge-silver">🥈 TOP 2</span>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,6 milhões
+                </div>
+                <div class="progress-bar" style="width: 89.7%;"></div>
+            </div>
+            <div class="playlist-item top-3" data-title="belmonte e amaraí - as melhores músicas">
+                <div class="rank">3</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Belmonte e Amaraí - As Melhores Músicas</div>
+                </div>
+                <span class="badge badge-bronze">🥉 TOP 3</span>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    225,0 mil
+                </div>
+                <div class="progress-bar" style="width: 7.8%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="alphaville - as melhores músicas">
+                <div class="rank">4</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Alphaville - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    179,0 mil
+                </div>
+                <div class="progress-bar" style="width: 6.2%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="alpha blondy - as melhores músicas">
+                <div class="rank">5</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Alpha Blondy - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    152,0 mil
+                </div>
+                <div class="progress-bar" style="width: 5.2%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="anjos de resgate - as melhores músicas">
+                <div class="rank">6</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Anjos de Resgate - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    119,0 mil
+                </div>
+                <div class="progress-bar" style="width: 4.1%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="adriana arydes - as melhores músicas">
+                <div class="rank">7</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Adriana Arydes - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    106,0 mil
+                </div>
+                <div class="progress-bar" style="width: 3.7%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="billy idol - as melhores músicas">
+                <div class="rank">8</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Billy Idol - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    105,0 mil
+                </div>
+                <div class="progress-bar" style="width: 3.6%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="al green - as melhores músicas">
+                <div class="rank">9</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Al Green - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    79,0 mil
+                </div>
+                <div class="progress-bar" style="width: 2.7%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="carta aberta - mc cabelinho | top trap nacional">
+                <div class="rank">10</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Carta Aberta - MC Cabelinho | Top Trap Nacional</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    72,0 mil
+                </div>
+                <div class="progress-bar" style="width: 2.5%;"></div>
+            </div>
+            <div class="playlist-item" data-title="agnus dei - as melhores músicas">
+                <div class="rank">11</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Agnus Dei - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    42,0 mil
+                </div>
+                <div class="progress-bar" style="width: 1.4%;"></div>
+            </div>
+            <div class="playlist-item" data-title="aurora - as melhores músicas">
+                <div class="rank">12</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Aurora - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    42,0 mil
+                </div>
+                <div class="progress-bar" style="width: 1.4%;"></div>
+            </div>
+            <div class="playlist-item" data-title="playlist para uber - música para todos os gostos">
+                <div class="rank">13</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Playlist para Uber - Música Para Todos os Gostos</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    20,0 mil
+                </div>
+                <div class="progress-bar" style="width: 0.7%;"></div>
+            </div>
+            <div class="playlist-item" data-title="monastery - ryan castro - cris mj - anuel aa - mix reggaeton">
+                <div class="rank">14</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Monastery - Ryan Castro - Cris Mj - Anuel AA - Mix Reggaeton</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    17,0 mil
+                </div>
+                <div class="progress-bar" style="width: 0.6%;"></div>
+            </div>
+            <div class="playlist-item" data-title="piadas mais engraçadas de 2021 stand-up afonso padilha, thiago...">
+                <div class="rank">15</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Piadas Mais Engraçadas de 2021 Stand-up Afonso Padilha, Thiago...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    14,0 mil
+                </div>
+                <div class="progress-bar" style="width: 0.5%;"></div>
+            </div>
+            <div class="playlist-item" data-title="b. j. thomas - as melhores músicas">
+                <div class="rank">16</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">B. J. Thomas - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    14,0 mil
+                </div>
+                <div class="progress-bar" style="width: 0.5%;"></div>
+            </div>
+            <div class="playlist-item" data-title="o sapo nao lava o pe - jazz - fundo do mar - mundo bita | melhores...">
+                <div class="rank">17</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">O Sapo Nao Lava o Pe - Jazz - Fundo do Mar - Mundo Bita | Melhores...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    12,0 mil
+                </div>
+                <div class="progress-bar" style="width: 0.4%;"></div>
+            </div>
+            <div class="playlist-item" data-title="remexo mexo - pingo de gente - pingo e sua turma | músicas para cr...">
+                <div class="rank">18</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Remexo Mexo - Pingo De Gente - Pingo E Sua Turma | Músicas Para Cr...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    8,9 mil
+                </div>
+                <div class="progress-bar" style="width: 0.3%;"></div>
+            </div>
+            <div class="playlist-item" data-title="músicas para salão de beleza - playlist pra ficar linda">
+                <div class="rank">19</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Salão de Beleza - Playlist Pra Ficar Linda</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    7,1 mil
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item" data-title="ali gatie - as melhores músicas">
+                <div class="rank">20</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Ali Gatie - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    7,0 mil
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item" data-title="funks dos últimos tempos - as mais tocadas - ritmo dos flu...">
+                <div class="rank">21</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Funks dos Últimos Tempos - As Mais Tocadas - Ritmo dos Flu...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    4,7 mil
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item" data-title="arrocha 2020 - desça daí seu corno - nenho">
+                <div class="rank">22</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Arrocha 2020 - Desça Daí Seu Corno - Nenho</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    4,3 mil
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item" data-title="angra - as melhores músicas">
+                <div class="rank">23</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Angra - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    3,2 mil
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item" data-title="meu cavalinho - pingo de gente - pingo e sua turma | melhores músic...">
+                <div class="rank">24</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Meu Cavalinho - Pingo De Gente - Pingo E Sua Turma | Melhores Músic...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,7 mil
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item" data-title="cúrame - rauw alejandro - feid - ryan castro - pop latino 2022">
+                <div class="rank">25</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Cúrame - Rauw Alejandro - Feid - Ryan Castro - Pop Latino 2022</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,2 mil
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item" data-title="vítima ou culpado - ao vivo - humberto & ronaldo | top músicas">
+                <div class="rank">26</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Vítima ou Culpado - Ao Vivo - Humberto & Ronaldo | Top Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1,8 mil
+                </div>
+                <div class="progress-bar" style="width: 0.1%;"></div>
+            </div>
+            <div class="playlist-item" data-title="esquema preferido - dj ivis - as mais tocadas">
+                <div class="rank">27</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Esquema Preferido - DJ Ivis - As Mais Tocadas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1,4 mil
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="banda eva - as melhores músicas">
+                <div class="rank">28</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Banda Eva - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1,2 mil
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="melhores músicas - malu, anna catarina, tierry - arrocha 2021 - disco ar...">
+                <div class="rank">29</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhores Músicas - Malu, Anna Catarina, Tierry - Arrocha 2021 - Disco Ar...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1,1 mil
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="alexandre pires - as melhores músicas">
+                <div class="rank">30</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Alexandre Pires - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1,1 mil
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="música do pão de queijo - o sapo não lava o pé - jazz - 1h de bolofofos - ...">
+                <div class="rank">31</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Música do Pão de Queijo - O Sapo não Lava o Pé - Jazz - 1h de Bolofofos - ...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1,0 mil
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="almir sater - as melhores músicas">
+                <div class="rank">32</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Almir Sater - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1,0 mil
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="eu fumei a árvore de natal - wiu | top trap nacional">
+                <div class="rank">33</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Eu Fumei a Árvore de Natal - WIU | Top Trap Nacional</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    961
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="ashe - as melhores músicas">
+                <div class="rank">34</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Ashe - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    945
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="birdy - as melhores músicas">
+                <div class="rank">35</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Birdy - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    923
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="ashnikko - as melhores músicas">
+                <div class="rank">36</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Ashnikko - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    881
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="bring me the horizon - as melhores músicas">
+                <div class="rank">37</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Bring Me The Horizon - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    876
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="2021 vem sentando vem - faz a pose - oh...">
+                <div class="rank">38</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">2021 VEM SENTANDO VEM - FAZ A POSE - Oh...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    796
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="músicas do tik tok 2021 vem sentando vem - faz a pose - oh...">
+                <div class="rank">39</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">MÚSICAS DO TIK TOK 2021 VEM SENTANDO VEM - FAZ A POSE - Oh...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    796
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="dictadura - anuel aa - eladio carrion - duki - lo mas sonado 2022">
+                <div class="rank">40</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Dictadura - Anuel AA - Eladio Carrion - Duki - Lo Mas Sonado 2022</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    785
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="cabelinho pra trás - thiago brava | hits atualizados">
+                <div class="rank">41</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Cabelinho Pra Trás - Thiago Brava | Hits Atualizados</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    712
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="batukerê - toda fé de salvador - baianasystem | melhores hits atualiza...">
+                <div class="rank">42</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Batukerê - Toda fé de Salvador - BaianaSystem | Melhores Hits Atualiza...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    702
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="fazendinha - mundo bita | hits atualizados para crianças">
+                <div class="rank">43</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Fazendinha - Mundo Bita | Hits Atualizados Para Crianças</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    664
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="rael da rima | rap nacional 2021 - as melhores">
+                <div class="rank">44</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Rael da Rima | Rap Nacional 2021 - As Melhores</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    662
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="benee - as melhores músicas">
+                <div class="rank">45</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">BENEE - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    639
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="eu balancei - pingo de gente - pingo e sua turma | top seleção hit...">
+                <div class="rank">46</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Eu Balancei - Pingo De Gente - Pingo E Sua Turma | Top Seleção Hit...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    626
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="los malvekes - cris mj - anuel aa - eladio carrion - canciones nuevas 2021">
+                <div class="rank">47</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Los Malvekes - Cris Mj - Anuel AA - Eladio Carrion - Canciones Nuevas 2021</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    489
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="sítio do seu lobato - galinha pintadinha | top músicas da semana par...">
+                <div class="rank">48</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Sítio do Seu Lobato - Galinha Pintadinha | Top Músicas da Semana Par...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    453
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="brett young - as melhores músicas">
+                <div class="rank">49</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Brett Young - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    450
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="alice maciel - as melhores músicas">
+                <div class="rank">50</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Alice Maciel - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    381
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="the bravery - as melhores músicas">
+                <div class="rank">51</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">The Bravery - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    380
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="trapped - fancy inc | top hits atualizado">
+                <div class="rank">52</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trapped - Fancy Inc | Top Hits Atualizado</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    331
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="banda calypso - as melhores músicas">
+                <div class="rank">53</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Banda Calypso - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    310
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="tenho que me decidir - mc ph | as top do trap br">
+                <div class="rank">54</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Tenho Que Me Decidir - MC PH | As Top do Trap BR</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    296
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="meleca e meleco - violúdico | top músicas para criança">
+                <div class="rank">55</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">MELECA E MELECO - Violúdico | Top Músicas Para Criança</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    276
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="top músicas infantis 2024">
+                <div class="rank">56</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Top Músicas Infantis 2024</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    271
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="wellerman - sea shanty 220 kid x billen ted remix - nathan evans - ...">
+                <div class="rank">57</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Wellerman - Sea Shanty 220 KID x Billen Ted Remix - Nathan Evans - ...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    264
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="amor livre - ao vivo - filipe ret | as top do trap br">
+                <div class="rank">58</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Amor Livre - Ao Vivo - Filipe Ret | As Top do Trap BR</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    262
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="roda roda roda - galinha pintadinha | melhores hits infantis">
+                <div class="rank">59</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Roda Roda Roda - Galinha Pintadinha | Melhores Hits Infantis</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    259
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="cuarentena - eladio carrion - duki - jhay cortez - año nuevo 2021">
+                <div class="rank">60</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Cuarentena - Eladio Carrion - Duki - Jhay Cortez - Año Nuevo 2021</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    230
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="friki - feid - anuel aa - cris mj - canciones de moda 2021">
+                <div class="rank">61</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">FRIKI - Feid - Anuel AA - Cris Mj - Canciones de Moda 2021</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    230
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="fumeteo - remix - feid - j balvin - ingratax - lo mas nuevo de todo 2022">
+                <div class="rank">62</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">FUMETEO - Remix - Feid - J Balvin - Ingratax - Lo Mas Nuevo De Todo 2022</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    230
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="lo siento bb:/ (with bad bunny & julieta venegas) - tainy - bad bunny - fe...">
+                <div class="rank">63</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Lo Siento BB:/ (with Bad Bunny & Julieta Venegas) - Tainy - Bad Bunny - Fe...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    213
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="the b-52's - as melhores músicas">
+                <div class="rank">64</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">The B-52's - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    163
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="pintinho amarelinho - galinha pintadinha | top músicas infantis">
+                <div class="rank">65</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Pintinho Amarelinho - Galinha Pintadinha | Top Músicas Infantis</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    157
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="sertanejo 2020 - um degrau na escada - leonardo">
+                <div class="rank">66</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Sertanejo 2020 - Um Degrau na Escada - Leonardo</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    153
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="julgamento - mc bin laden | top hits">
+                <div class="rank">67</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Julgamento - MC Bin Laden | Top Hits</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    144
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="fala na cara - mc paiva zs | trap atualizado">
+                <div class="rank">68</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Fala na Cara - MC Paiva ZS | Trap Atualizado</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    140
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="gospel - anderson freire - louvor e adoração">
+                <div class="rank">69</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Gospel - Anderson Freire - Louvor e Adoração</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    129
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="kissing strangers - usher | top seleção">
+                <div class="rank">70</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Kissing Strangers - USHER | Top Seleção</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    127
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="playlist para hamburgueria 2021 - restaurante - barzinho">
+                <div class="rank">71</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Playlist Para Hamburgueria 2021 - Restaurante - Barzinho</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    123
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="músicas para restaurantes e lanchonetes 2025 - bar...">
+                <div class="rank">72</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Restaurantes e Lanchonetes 2025 - Bar...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    109
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="vacation - dirty heads - as mais tocadas">
+                <div class="rank">73</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Vacation - Dirty Heads - As Mais Tocadas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    106
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="para de mentir - oruam | top trap nacional">
+                <div class="rank">74</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Para de Mentir - Oruam | Top Trap Nacional</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    100
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="bastille - as melhores músicas">
+                <div class="rank">75</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Bastille - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    88
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="ana vilela e hits nacionais 2021 - mpb pop">
+                <div class="rank">76</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Ana Vilela e Hits Nacionais 2021 - MPB Pop</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    84
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="o sapo agora lava o pé - pingo de gente - pingo e sua turma | melhores hi...">
+                <div class="rank">77</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">O Sapo Agora Lava o Pé - Pingo de Gente - Pingo e Sua Turma | Melhores Hi...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    84
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="alejandro sanz - as melhores músicas">
+                <div class="rank">78</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Alejandro Sanz - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    83
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="upa cavalinho - galinha pintadinha | melhores hits infantis atualizados">
+                <div class="rank">79</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Upa Cavalinho - Galinha Pintadinha | Melhores Hits Infantis Atualizados</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    83
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="sertanejo 2020 - olha ela aí - eduardo costa">
+                <div class="rank">80</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Sertanejo 2020 - Olha Ela Aí - Eduardo Costa</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    78
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="brad paisley - as melhores músicas">
+                <div class="rank">81</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Brad Paisley - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    76
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="boyce avenue - as melhores músicas">
+                <div class="rank">82</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Boyce Avenue - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    76
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="sertanejo 2020 - laço aberto - leonardo">
+                <div class="rank">83</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Sertanejo 2020 - Laço Aberto - Leonardo</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    66
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="apaixonada - mara pavanelly | top novidades da semana">
+                <div class="rank">84</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Apaixonada - Mara Pavanelly | Top Novidades da Semana</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    65
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="me toca - marina sena - as mais tocadas">
+                <div class="rank">85</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Me Toca - Marina Sena - As Mais Tocadas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    64
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="alcione - as melhores músicas">
+                <div class="rank">86</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Alcione - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    62
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="cintura covarde - rimar 9 - boca | top novidades da semana">
+                <div class="rank">87</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Cintura Covarde - RIMAR 9 - Boca | Top Novidades da Semana</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    58
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="una nota - j balvin - ingratax - rauw alejandro - nueva musica 2022">
+                <div class="rank">88</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Una Nota - J Balvin - Ingratax - Rauw Alejandro - Nueva Musica 2022</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    57
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="pop 2020 - chega - duda beat">
+                <div class="rank">89</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">POP 2020 - Chega - DUDA BEAT</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    55
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="yin yan - duki - tainy - bad bunny - musica de tiktok 2022">
+                <div class="rank">90</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">YIN YAN - Duki - Tainy - Bad Bunny - Musica de TikTok 2022</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    55
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="coldplay - as melhores músicas">
+                <div class="rank">91</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Coldplay - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    50
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="priscilla alcântara 2021 gospel - anderson freire - louvor e adoração">
+                <div class="rank">92</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Priscilla Alcântara 2021 Gospel - Anderson Freire - Louvor e Adoração</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    49
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="the animals - as melhores músicas">
+                <div class="rank">93</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">The Animals - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    48
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="canções de natal - as melhores músicas">
+                <div class="rank">94</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Canções de Natal - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    46
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="músicas para confraternização | festa corporativa - as melhor...">
+                <div class="rank">95</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Confraternização | Festa Corporativa - As Melhor...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    45
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="annie lennox - as melhores músicas">
+                <div class="rank">96</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Annie Lennox - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    45
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="louvor e adoração 2021 - casa worship, isaias saad, priscilla alcântara">
+                <div class="rank">97</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Louvor e Adoração 2021 - Casa Worship, Isaias Saad, Priscilla Alcântara</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    43
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="a divisão - pingo de gente - pingo e sua turma | top músicas inf...">
+                <div class="rank">98</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">A Divisão - Pingo De Gente - Pingo E Sua Turma | Top Músicas Inf...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    41
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="ô lelê ô lalá - pingo de gente - pingo e sua turma | top músicas da...">
+                <div class="rank">99</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Ô Lelê Ô Lalá - Pingo De Gente - Pingo E Sua Turma | Top Músicas da...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    40
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="berthassaura leopoldina - little cats | os melhores hits infantis">
+                <div class="rank">100</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Berthassaura Leopoldina - Little Cats | Os Melhores Hits Infantis</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    40
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="arrocha 2020 - acertou bebê - luanzinho moraes">
+                <div class="rank">101</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Arrocha 2020 - Acertou Bebê - Luanzinho Moraes</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    39
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="adriana calcanhotto - as melhores músicas">
+                <div class="rank">102</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Adriana Calcanhotto - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    38
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="doce amargo - danzo | top hits atualizado">
+                <div class="rank">103</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Doce Amargo - Danzo | Top Hits Atualizado</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    38
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="agnaldo timóteo - as melhores músicas">
+                <div class="rank">104</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Agnaldo Timóteo - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    34
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="ava max - as melhores músicas">
+                <div class="rank">105</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Ava Max - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    33
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="ana nóbrega - as melhores músicas">
+                <div class="rank">106</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Ana Nóbrega - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    32
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="lenda - borges | as top do trap br">
+                <div class="rank">107</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Lenda - Borges | As Top do Trap BR</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    28
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="tava escrito nas estrelas - mc arizinho | melhores hits atualizados">
+                <div class="rank">108</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Tava Escrito nas Estrelas - Mc Arizinho | Melhores Hits Atualizados</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    27
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="10 carros - chefin | trap atualizado">
+                <div class="rank">109</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">10 Carros - Chefin | Trap Atualizado</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    25
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="deixa eu falar pra você - josué bom de faixa">
+                <div class="rank">110</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Deixa Eu Falar pra Você - Josué Bom de Faixa</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    23
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="vem com a liga da alegria - liga da alegria | melhores hits infantis">
+                <div class="rank">111</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Vem com a Liga da Alegria - Liga Da Alegria | Melhores Hits Infantis</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    21
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="calor da porr* - gab | melhores hits">
+                <div class="rank">112</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Calor da Porr* - GAB | Melhores Hits</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    21
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="bad bunny - les meilleures - dtmf 2026">
+                <div class="rank">113</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Bad Bunny - Les Meilleures - DtMF 2026</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    18
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="mesma história - orochi | trap atualizado">
+                <div class="rank">114</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Mesma História - Orochi | Trap Atualizado</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    18
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="las de octubre - ingratax - rauw alejandro - feid - mas nuevo 2021">
+                <div class="rank">115</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Las de Octubre - Ingratax - Rauw Alejandro - Feid - Mas Nuevo 2021</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    18
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="blondie - as melhores músicas">
+                <div class="rank">116</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Blondie - As Melhores Músicas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    16
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="passinho da sofrência - thiago aquino | melhores hits atualizados">
+                <div class="rank">117</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Passinho da Sofrência - Thiago Aquino | Melhores Hits Atualizados</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    15
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="músicas para karaokê 2021 - repertório das mais pedidas nos karao...">
+                <div class="rank">118</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Músicas Para Karaokê 2021 - Repertório das Mais Pedidas nos Karao...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    14
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="2021 - repertório das mais pedidas nos karao...">
+                <div class="rank">119</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">2021 - Repertório das Mais Pedidas nos Karao...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    14
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="streets - doja cat - as mais tocadas">
+                <div class="rank">120</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Streets - Doja Cat - As Mais Tocadas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    14
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="o sapo não lava o pé - jazz blues - dona aranha - marcha soldado - mús...">
+                <div class="rank">121</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">O Sapo Não Lava O Pé - Jazz Blues - Dona Aranha - Marcha Soldado - Mús...</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    11
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="piano fundo de oração - 1h de gospel instrumental">
+                <div class="rank">122</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Piano Fundo de Oração - 1h de Gospel Instrumental</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    11
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="tan tan tan - japãozin | melhores hits atualizados">
+                <div class="rank">123</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Tan Tan Tan - Japãozin | Melhores Hits Atualizados</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    11
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="pop 2020 - amor marginal - johnny hooker">
+                <div class="rank">124</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">POP 2020 - Amor Marginal - Johnny Hooker</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    11
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="espirra o lança - dj serpinha - as mais tocadas">
+                <div class="rank">125</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Espirra o Lança - Dj Serpinha - As Mais Tocadas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    10
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="pop 2020 - corpo fechado - johnny hooker">
+                <div class="rank">126</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">POP 2020 - Corpo Fechado - Johnny Hooker</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    10
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="melhor só - kayblack | as top do trap br">
+                <div class="rank">127</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Melhor Só - KayBlack | As Top do Trap BR</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    9
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="pop 2020 - alma sebosa - johnny hooker">
+                <div class="rank">128</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">POP 2020 - Alma Sebosa - Johnny Hooker</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    9
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="meu cachorrinho não fazia au au">
+                <div class="rank">129</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Meu Cachorrinho Não Fazia Au Au</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    8
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="don't call me - shinee - as mais tocadas">
+                <div class="rank">130</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Don't Call Me - SHINee - As Mais Tocadas</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    8
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="indecisão - mc ws da leste | top hits">
+                <div class="rank">131</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Indecisão - Mc Ws da leste | Top Hits</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    7
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="loucura - borges | melhores trap br">
+                <div class="rank">132</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Loucura - Borges | Melhores Trap BR</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    6
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="de marola - azevedo | melhores trap br">
+                <div class="rank">133</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">De Marola - Azevedo | Melhores Trap BR</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    6
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="cão amigo - galinha pintadinha | top seleção hits infantis">
+                <div class="rank">134</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Cão Amigo - Galinha Pintadinha | Top Seleção Hits Infantis</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    5
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="foto da unha - l7nnon | melhores trap br">
+                <div class="rank">135</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Foto da Unha - L7NNON | Melhores Trap BR</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    3
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+            <div class="playlist-item" data-title="não entra se não for ficar - ao vivo - vitor e luan | top seleção">
+                <div class="rank">136</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Não Entra Se Não For Ficar - Ao Vivo - Vitor e Luan | Top Seleção</div>
+                </div>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2
+                </div>
+                <div class="progress-bar" style="width: 0.0%;"></div>
+            </div>
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            Nenhuma playlist encontrada 😕
+        </div>
+
+        <div class="footer">
+            Dados compilados de visualizações do YouTube
+        </div>
+    </div>
+
+    <script>
+        function filterPlaylists() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const list = document.getElementById('playlistList');
+            const items = list.getElementsByClassName('playlist-item');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            for (let i = 0; i < items.length; i++) {
+                const title = items[i].getAttribute('data-title');
+                if (title.includes(filter)) {
+                    items[i].style.display = '';
+                    visibleCount++;
+                } else {
+                    items[i].style.display = 'none';
+                }
+            }
+
+            if (visibleCount === 0) {
+                list.style.display = 'none';
+                noResults.style.display = '';
+            } else {
+                list.style.display = '';
+                noResults.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

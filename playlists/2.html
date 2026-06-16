@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta name="robots" content="noindex" />
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlists Mais Visualizadas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 6s ease infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            color: #a0a0b0;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #feca57;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #8888a0;
+            margin-top: 4px;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: #feca57;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .search-box input::placeholder {
+            color: #666;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .playlist-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .playlist-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #ff6b6b, #feca57);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 16px 0 0 16px;
+        }
+
+        .playlist-item:hover {
+            background: rgba(255,255,255,0.07);
+            transform: translateX(5px);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .playlist-item:hover::before {
+            opacity: 1;
+        }
+
+        .playlist-item.copied {
+            animation: copiedPulse 0.6s ease;
+        }
+
+        @keyframes copiedPulse {
+            0% { border-color: rgba(72, 219, 251, 0.5); box-shadow: 0 0 0 4px rgba(72, 219, 251, 0.2); }
+            100% { border-color: rgba(255,255,255,0.05); box-shadow: none; }
+        }
+
+        .playlist-item.top-1 {
+            background: linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,215,0,0.03));
+            border-color: rgba(255,215,0,0.35);
+            box-shadow: 0 8px 32px rgba(255,215,0,0.15);
+        }
+
+        .playlist-item.top-1 .rank {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            box-shadow: 0 4px 20px rgba(255,215,0,0.4);
+            font-size: 1.2rem;
+            width: 48px;
+            height: 48px;
+        }
+
+        .playlist-item.top-2 {
+            background: linear-gradient(135deg, rgba(192,192,192,0.1), rgba(192,192,192,0.03));
+            border-color: rgba(192,192,192,0.3);
+            box-shadow: 0 6px 24px rgba(192,192,192,0.1);
+        }
+
+        .playlist-item.top-2 .rank {
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            color: #1a1a2e;
+            box-shadow: 0 4px 15px rgba(192,192,192,0.3);
+        }
+
+        .playlist-item.top-3 {
+            background: linear-gradient(135deg, rgba(205,127,50,0.1), rgba(205,127,50,0.03));
+            border-color: rgba(205,127,50,0.3);
+            box-shadow: 0 6px 24px rgba(205,127,50,0.1);
+        }
+
+        .playlist-item.top-3 .rank {
+            background: linear-gradient(135deg, #cd7f32, #b87333);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(205,127,50,0.3);
+        }
+
+        .playlist-item.top-10 {
+            background: linear-gradient(135deg, rgba(100,200,255,0.05), rgba(100,200,255,0.01));
+            border-color: rgba(100,200,255,0.12);
+        }
+
+        .playlist-item.top-10 .rank {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            color: #1a1a2e;
+        }
+
+        .rank {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.08);
+            color: #8888a0;
+            transition: all 0.3s ease;
+        }
+
+        .playlist-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .playlist-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f0f0f0;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .playlist-item:hover .playlist-title {
+            color: #fff;
+        }
+
+        .playlist-views {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #feca57;
+            white-space: nowrap;
+        }
+
+        .playlist-views .eye-icon {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb);
+            border-radius: 0 0 0 16px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .playlist-item:hover .progress-bar {
+            opacity: 1;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+        }
+
+        .badge-silver {
+            background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+            color: #1a1a2e;
+        }
+
+        .badge-bronze {
+            background: linear-gradient(135deg, #cd7f32, #b87333);
+            color: #fff;
+        }
+
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(30, 30, 50, 0.95);
+            color: #48dbfb;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid rgba(72, 219, 251, 0.3);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #555;
+            font-size: 0.85rem;
+        }
+
+        /* ========== MOBILE RESPONSIVE ========== */
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+            .header {
+                padding: 24px 12px;
+                margin-bottom: 20px;
+            }
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            .header p {
+                font-size: 0.9rem;
+            }
+            .stats-bar {
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .stat-item {
+                padding: 10px 14px;
+                flex: 1;
+                min-width: 100px;
+            }
+            .stat-value {
+                font-size: 1.3rem;
+            }
+            .stat-label {
+                font-size: 0.7rem;
+            }
+            .search-box {
+                margin-bottom: 20px;
+            }
+            .search-box input {
+                padding: 12px 16px 12px 44px;
+                font-size: 0.9rem;
+            }
+            .playlist-item {
+                padding: 12px 14px;
+                gap: 10px;
+            }
+            .rank {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                font-size: 0.85rem;
+            }
+            .playlist-item.top-1 .rank,
+            .playlist-item.top-2 .rank,
+            .playlist-item.top-3 .rank {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+            .playlist-title {
+                font-size: 0.85rem;
+            }
+            .playlist-views {
+                font-size: 0.75rem;
+                gap: 4px;
+            }
+            .badge {
+                font-size: 0.6rem;
+                padding: 2px 6px;
+            }
+            .footer {
+                padding: 24px 12px;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Playlists Mais Visualizadas</h1>
+            <p>Ranking das playlists por número de visualizações</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">24</div>
+                <div class="stat-label">Playlists</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">2732,4 mil</div>
+                <div class="stat-label">Visualizações Totais</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">635,0 mil</div>
+                <div class="stat-label">Maior Playlist</div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Buscar playlist..." onkeyup="filterPlaylists()">
+        </div>
+
+        <div class="playlist-list" id="playlistList">
+            <div class="playlist-item top-1" data-title="japozin - japozin - brabodosparedões - japozindacachoeira">
+                <div class="rank">1</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Japozin - Japozin - BrabodosParedões - JapozindaCachoeira</div>
+                </div>
+                <span class="badge badge-gold">🏆 TOP 1</span>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    635,0 mil
+                </div>
+                <div class="progress-bar" style="width: 100.0%;"></div>
+            </div>
+            <div class="playlist-item top-2" data-title="bala love - baile do cinga do 12 - mc gontijo">
+                <div class="rank">2</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Bala Love - BAILE DO CINGA do 12 - MC Gontijo</div>
+                </div>
+                <span class="badge badge-silver">🥈 TOP 2</span>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    322,0 mil
+                </div>
+                <div class="progress-bar" style="width: 50.7%;"></div>
+            </div>
+            <div class="playlist-item top-3" data-title="bezerra da silva - as melhores músicas">
+                <div class="rank">3</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Bezerra da Silva - As Melhores Músicas</div>
+                </div>
+                <span class="badge badge-bronze">🥉 TOP 3</span>
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    318,0 mil
+                </div>
+                <div class="progress-bar" style="width: 50.1%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="borracho - sech - don omar - blessd - año nuevo 2021">
+                <div class="rank">4</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Borracho - Sech - Don Omar - Blessd - Año Nuevo 2021</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    267,0 mil
+                </div>
+                <div class="progress-bar" style="width: 42.0%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="bota em você machuca (feat. flow key, bernax e dj rd) - mc jottapê, m...">
+                <div class="rank">5</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Bota Em Você Machuca (feat. Flow Key, Bernax e DJ RD) - MC JottaPê, M...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    229,0 mil
+                </div>
+                <div class="progress-bar" style="width: 36.1%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="085 - ao vivo - by mc rogerinho - hits do momento">
+                <div class="rank">6</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">085 - Ao Vivo - by MC Rogerinho - Hits do Momento</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    227,0 mil
+                </div>
+                <div class="progress-bar" style="width: 35.7%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="hits mpb 2020 - dois corações - melim">
+                <div class="rank">7</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Hits MPB 2020 - Dois Corações - Melim</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    220,0 mil
+                </div>
+                <div class="progress-bar" style="width: 34.6%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="pulei na piscina - ao vivo - guilherme & benuto">
+                <div class="rank">8</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Pulei na Piscina - Ao Vivo - Guilherme & Benuto</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    220,0 mil
+                </div>
+                <div class="progress-bar" style="width: 34.6%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="hits do brasil - funk - sertanejo - mais tocados">
+                <div class="rank">9</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Hits do Brasil - Funk - Sertanejo - Mais tocados</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    205,0 mil
+                </div>
+                <div class="progress-bar" style="width: 32.3%;"></div>
+            </div>
+            <div class="playlist-item top-10" data-title="hits do momento - funk - assunto particular - by oruam, ajaxx, and m...">
+                <div class="rank">10</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Hits do momento - Funk - Assunto Particular - by Oruam, Ajaxx, and M...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    36,0 mil
+                </div>
+                <div class="progress-bar" style="width: 5.7%;"></div>
+            </div>
+            <div class="playlist-item " data-title="invejoso sai do meu pé, uh sai pra lá">
+                <div class="rank">11</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Invejoso sai do meu pé, uh sai pra lá</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    7,2 mil
+                </div>
+                <div class="progress-bar" style="width: 1.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="anan al makel (cloud on a stick - anan al makel quartet">
+                <div class="rank">12</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Anan Al Makel (Cloud On a Stick - Anan Al Makel Quartet</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    7,0 mil
+                </div>
+                <div class="progress-bar" style="width: 1.1%;"></div>
+            </div>
+            <div class="playlist-item " data-title="magrão speaks to me - wagneriz, dj thiago mendes, dj júlia zamb...">
+                <div class="rank">13</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Magrão Speaks To Me - WAGNERIZ, DJ Thiago Mendes, DJ Júlia Zamb...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    5,5 mil
+                </div>
+                <div class="progress-bar" style="width: 0.9%;"></div>
+            </div>
+            <div class="playlist-item " data-title="industry baby - lil nas x - top 50 hits 2021">
+                <div class="rank">14</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Industry Baby - Lil Nas X - Top 50 Hits 2021</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    5,4 mil
+                </div>
+                <div class="progress-bar" style="width: 0.9%;"></div>
+            </div>
+            <div class="playlist-item " data-title="não nasceu pra namorar - o moça - mc zaquin">
+                <div class="rank">15</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Não Nasceu Pra Namorar - O Moça - MC Zaquin</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    5,2 mil
+                </div>
+                <div class="progress-bar" style="width: 0.8%;"></div>
+            </div>
+            <div class="playlist-item " data-title="enquanto eu brindo cê chora - ao vivo - bruno & marrone">
+                <div class="rank">16</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Enquanto Eu Brindo Cê Chora - Ao Vivo - Bruno & Marrone</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    3,8 mil
+                </div>
+                <div class="progress-bar" style="width: 0.6%;"></div>
+            </div>
+            <div class="playlist-item " data-title="black sabbath - as melhores músicas">
+                <div class="rank">17</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Black Sabbath - As Melhores Músicas</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    3,6 mil
+                </div>
+                <div class="progress-bar" style="width: 0.6%;"></div>
+            </div>
+            <div class="playlist-item " data-title="bruno & marrone 2020 hits do sertanejo - lançamentos sofrência...">
+                <div class="rank">18</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Bruno & Marrone 2020 Hits do Sertanejo - Lançamentos Sofrência...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    3,3 mil
+                </div>
+                <div class="progress-bar" style="width: 0.5%;"></div>
+            </div>
+            <div class="playlist-item " data-title="unha pintada 2021 - facas - meu pedaço de pecado">
+                <div class="rank">19</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Unha Pintada 2021 - Facas - Meu Pedaço de Pecado</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,7 mil
+                </div>
+                <div class="progress-bar" style="width: 0.4%;"></div>
+            </div>
+            <div class="playlist-item " data-title="amor perfeito - chiclete com banana">
+                <div class="rank">20</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Amor Perfeito - Chiclete Com Banana</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,5 mil
+                </div>
+                <div class="progress-bar" style="width: 0.4%;"></div>
+            </div>
+            <div class="playlist-item " data-title="bryson tiller - as melhores músicas">
+                <div class="rank">21</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Bryson Tiller - As Melhores Músicas</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,5 mil
+                </div>
+                <div class="progress-bar" style="width: 0.4%;"></div>
+            </div>
+            <div class="playlist-item " data-title="trapzin br 2021 - matuê, sidoka, recayd mob - máquina do tempo...">
+                <div class="rank">22</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Trapzin BR 2021 - Matuê, Sidoka, Recayd Mob - Máquina do Tempo...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    2,5 mil
+                </div>
+                <div class="progress-bar" style="width: 0.4%;"></div>
+            </div>
+            <div class="playlist-item " data-title="let's go 3 (feat. mc marks, mc don juan, mc ph, mc luki, mc paiva z...">
+                <div class="rank">23</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Let's Go 3 (feat. MC Marks, Mc Don Juan, MC PH, Mc Luki, Mc Paiva Z...</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1,1 mil
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+            <div class="playlist-item " data-title="te vi lembrei que tu era da minha sala">
+                <div class="rank">24</div>
+                <div class="playlist-info">
+                    <div class="playlist-title">Te Vi Lembrei Que Tu Era da Minha Sala</div>
+                </div>
+                
+                <div class="playlist-views">
+                    <span class="eye-icon">👁</span>
+                    1,1 mil
+                </div>
+                <div class="progress-bar" style="width: 0.2%;"></div>
+            </div>
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            Nenhuma playlist encontrada 😕
+        </div>
+
+        <div class="footer">
+            Dados compilados de visualizações do YouTube
+        </div>
+    </div>
+
+    <div class="copy-toast" id="copyToast">📋 Título copiado!</div>
+
+    <script>
+        function filterPlaylists() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const list = document.getElementById('playlistList');
+            const items = list.getElementsByClassName('playlist-item');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            for (let i = 0; i < items.length; i++) {
+                const title = items[i].getAttribute('data-title');
+                if (title.includes(filter)) {
+                    items[i].style.display = '';
+                    visibleCount++;
+                } else {
+                    items[i].style.display = 'none';
+                }
+            }
+
+            if (visibleCount === 0) {
+                list.style.display = 'none';
+                noResults.style.display = '';
+            } else {
+                list.style.display = '';
+                noResults.style.display = 'none';
+            }
+        }
+
+        // Clique para copiar título
+        document.querySelectorAll('.playlist-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const title = item.querySelector('.playlist-title').textContent;
+                navigator.clipboard.writeText(title).then(() => {
+                    item.classList.add('copied');
+                    setTimeout(() => item.classList.remove('copied'), 600);
+                    const toast = document.getElementById('copyToast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
