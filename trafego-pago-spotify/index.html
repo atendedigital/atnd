@@ -55,6 +55,15 @@
     letter-spacing:0.02em;
   }
 
+  .brand a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .brand a:hover {
+    color: var(--accent);
+  }
+
   .brand .dot{
     width:8px;height:8px;border-radius:50%;
     background:var(--accent);
@@ -127,6 +136,16 @@
     font-size:14px;
     color:#04140a;
     flex-shrink:0;
+  }
+
+  .byline a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .byline a:hover {
+    color: var(--accent);
   }
 
   .byline strong{ color:var(--ink); }
@@ -231,6 +250,16 @@
 
   .callout p{ margin-bottom:0; font-size:15px; color:#d6dbd6; }
 
+  .callout a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .callout a:hover {
+    text-decoration: underline;
+  }
+
   /* ---------- tabela de targeting ---------- */
   table{
     width:100%;
@@ -293,6 +322,16 @@
     margin-bottom:22px;
   }
 
+  .final-cta p a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .final-cta p a:hover {
+    text-decoration: underline;
+  }
+
   .handle-btn{
     display:inline-flex;
     align-items:center;
@@ -306,11 +345,27 @@
     text-decoration:none;
   }
 
+  .handle-btn:hover {
+    background: #22e06a;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+  }
+
   footer{
     text-align:center;
     padding:40px 0 0;
     color:var(--ink-soft);
     font-size:12.5px;
+  }
+
+  footer a {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  footer a:hover {
+    color: var(--accent);
   }
 
   footer strong{ color:var(--ink); }
@@ -325,7 +380,7 @@
 <body>
 
   <header class="masthead">
-    <div class="brand"><span class="dot"></span> @atendemidia</div>
+    <div class="brand"><span class="dot"></span> <a href="https://instagram.com/atendemidia" target="_blank" rel="noopener">@atendemidia</a></div>
     <nav>Marketing & Content Creator</nav>
   </header>
 
@@ -338,7 +393,7 @@
 
       <div class="byline">
         <div class="avatar">AM</div>
-        <div>Por <strong>@atendemidia</strong> · Marketing & Content Creator</div>
+        <div>Por <strong><a href="https://instagram.com/atendemidia" target="_blank" rel="noopener">@atendemidia</a></strong> · Marketing & Content Creator</div>
       </div>
     </div>
 
@@ -350,7 +405,7 @@
 
       <div class="callout">
         <span class="label">O que o @atendemidia recomenda</span>
-        <p>Use <strong>Conversão</strong> como objetivo de campanha, com um Smart Link (Hypeddit, Feature.fm ou Linkfire) ou uma landing própria, com o <strong>Pixel do Meta</strong> instalado nela — nunca aponte o anúncio direto pro Spotify.</p>
+        <p>Use <strong>Conversão</strong> como objetivo de campanha, com um Smart Link (<a href="https://hypeddit.com/" target="_blank" rel="noopener">Hypeddit</a>, <a href="https://feature.fm/" target="_blank" rel="noopener">Feature.fm</a> ou <a href="https://linkfire.com/" target="_blank" rel="noopener">Linkfire</a>) ou uma landing própria, com o <strong>Pixel do Meta</strong> instalado nela — nunca aponte o anúncio direto pro Spotify.</p>
       </div>
 
       <ul class="checklist">
@@ -393,7 +448,7 @@
         <p>O Meta não rastreia o que acontece depois que a pessoa sai do app, a não ser que exista uma página intermediária com Pixel instalado. Sem isso, a métrica que você vê é "clique no link" — não "abriu o Spotify e ouviu".</p>
       </div>
 
-      <h2>O resumo que o @atendemidia aplica em toda conta</h2>
+      <h2>O resumo que o <a href="https://instagram.com/atendemidia" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">@atendemidia</a> aplica em toda conta</h2>
       <p>O que garante a saída do Instagram pro Spotify não é um truque isolado — é a combinação de três engrenagens girando juntas:</p>
 
       <ul class="checklist">
@@ -407,12 +462,12 @@
 
     <div class="final-cta">
       <h3>Quer rodar isso na sua playlist?</h3>
-      <p>O @atendemidia estrutura campanha, landing e criativo pra curadores que querem crescer de verdade no Spotify.</p>
-      <a class="handle-btn" href="http://instagram.com/atendemidia" target="_blank" rel="noopener">Seguir @atendemidia</a>
+      <p>O <a href="https://instagram.com/atendemidia" target="_blank" rel="noopener">@atendemidia</a> estrutura campanha, landing e criativo pra curadores que querem crescer de verdade no Spotify.</p>
+      <a class="handle-btn" href="https://instagram.com/atendemidia" target="_blank" rel="noopener">Seguir @atendemidia</a>
     </div>
 
     <footer>
-      Publicado por <strong>@atendemidia</strong> — conteúdo sobre mídia paga para música e curadoria de playlists.
+      Publicado por <strong><a href="https://instagram.com/atendemidia" target="_blank" rel="noopener">@atendemidia</a></strong> — conteúdo sobre mídia paga para música e curadoria de playlists.
     </footer>
 
   </div>
