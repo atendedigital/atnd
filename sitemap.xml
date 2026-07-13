@@ -1,54 +1,131 @@
----
-layout: null
-sitemap: false
----
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-
-  <!-- Página inicial -->
-  <url>
-    <loc>{{ site.url | default: "https://atendemidia.com.br" }}</loc>
-    <lastmod>{{ site.time | date: "%Y-%m-%d" }}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-
-  <!-- Todas as páginas (exceto as que têm sitemap: false no front matter) -->
-  {% for page in site.pages %}
-    {% if page.sitemap != false and page.url != "/404.html" %}
-  <url>
-    <loc>{{ site.url | default: "https://atendemidia.com.br" }}{{ page.url | remove: "index.html" }}</loc>
-    {% if page.last_modified_at %}
-      <lastmod>{{ page.last_modified_at | date: "%Y-%m-%d" }}</lastmod>
-    {% elsif page.date %}
-      <lastmod>{{ page.date | date: "%Y-%m-%d" }}</lastmod>
-    {% else %}
-      <lastmod>{{ site.time | date: "%Y-%m-%d" }}</lastmod>
-    {% endif %}
-    <priority>0.8</priority>
-  </url>
-    {% endif %}
-  {% endfor %}
-
-  <!-- Todos os posts JÁ PUBLICADOS ou com data de hoje ou anterior -->
-{% assign now = site.time | date: '%s' %}
-{% for post in site.posts %}
-  {% assign post_date = post.date | date: '%s' %}
-  {% if post_date <= now %}
-  <url>
-    <loc>{{ site.url }}{{ post.url }}</loc>
-    {% if post.last_modified_at %}
-      <lastmod>{{ post.last_modified_at | date_to_xmlschema }}</lastmod>
-    {% else %}
-      <lastmod>{{ post.date | date_to_xmlschema }}</lastmod>
-    {% endif %}
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  {% endif %}
-{% endfor %}
-
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>https://atendemidia.com.br/</loc>
+<lastmod>2025-12-03T23:40:42-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/analise.html</loc>
+<lastmod>2025-06-01T02:16:07-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/eventos.html</loc>
+<lastmod>2025-06-01T02:16:07-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/gastronomia.html</loc>
+<lastmod>2025-06-01T02:16:07-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/gerariso.html</loc>
+<lastmod>2025-12-09T15:07:14-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/googlea6b51e5c39a1cc33.html</loc>
+<lastmod>2025-12-05T15:02:46-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/links.html</loc>
+<lastmod>2026-01-26T16:07:07-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/mailchimp.html</loc>
+<lastmod>2025-06-01T02:16:07-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/postsdeoficina.html</loc>
+<lastmod>2025-12-17T18:48:55-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/postsdepsicologia.html</loc>
+<lastmod>2026-02-11T23:38:36Z</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/prompts.html</loc>
+<lastmod>2026-01-03T09:23:10-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/tiposdivulga.html</loc>
+<lastmod>2025-06-01T02:16:07-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/_layouts/post.html</loc>
+<lastmod>2025-11-28T10:50:14-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/</loc>
+<lastmod>2025-06-01T02:30:26-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/bahia.html</loc>
+<lastmod>2026-04-11T09:15:09-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/barcelona.html</loc>
+<lastmod>2026-04-01T16:04:28-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/brasil.html</loc>
+<lastmod>2026-04-01T16:04:28-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/como-funciona.html</loc>
+<lastmod>2025-06-01T02:30:26-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/corinthians.html</loc>
+<lastmod>2026-04-11T09:15:09-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/flamengo.html</loc>
+<lastmod>2026-04-11T09:15:09-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/fluminense.html</loc>
+<lastmod>2026-04-01T16:04:28-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/gremio.html</loc>
+<lastmod>2026-04-01T16:04:28-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/palmeiras.html</loc>
+<lastmod>2026-04-11T09:15:09-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/santos.html</loc>
+<lastmod>2026-04-01T16:04:28-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/vasco.html</loc>
+<lastmod>2026-04-01T16:04:28-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/vitoria.html</loc>
+<lastmod>2026-04-01T16:04:28-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/influencerstudio/</loc>
+<lastmod>2026-03-18T15:50:52-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/qr/</loc>
+<lastmod>2025-06-18T16:31:19-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/trafego-pago-spotify/</loc>
+<lastmod>2026-06-24T09:31:58-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/fonts/icomoon/demo.html</loc>
+<lastmod>2025-06-01T02:21:24-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/fonts/flaticon/font/flaticon.html</loc>
+<lastmod>2025-06-01T02:21:24-03:00</lastmod>
+</url>
+<url>
+<loc>https://atendemidia.com.br/agendafut/fonts/flaticon/license/license.pdf</loc>
+<lastmod>2025-06-01T02:21:24-03:00</lastmod>
+</url>
 </urlset>
